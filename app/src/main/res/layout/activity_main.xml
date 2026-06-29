@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/lty_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="#FFFFFF"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/img_logo"
+        android:layout_width="322dp"
+        android:layout_height="204dp"
+        android:src="@drawable/buho" />
+
+    <TextView
+        android:id="@+id/lbl_title"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:gravity="center"
+        android:text="Ingrese sus Credenciales"
+        android:textColor="#000000"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/txt_mail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:ems="10"
+        android:hint="E-mail"
+        android:inputType="textEmailAddress"
+        android:textColorHint="#000000" />
+
+    <EditText
+        android:id="@+id/txt_phone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:ems="10"
+        android:hint="Phone"
+        android:inputType="phone"
+        android:textColorHint="#000000" />
+
+    <EditText
+        android:id="@+id/txt_pass"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:textColorHint="#000000" />
+
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:background="#1F1D1D"
+        android:text="Ingresar"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+</LinearLayout>
