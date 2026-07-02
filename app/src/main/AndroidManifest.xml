@@ -12,6 +12,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ProyectoIIBM">
         <activity
+            android:name=".AgendarCitaActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MisActivities"/>
+        <activity
+            android:name=".SecondActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MisActivities"/>
+        <activity
             android:name=".FirstActivity"
             android:exported="false"
             android:theme="@style/Theme.MisActivities"/>

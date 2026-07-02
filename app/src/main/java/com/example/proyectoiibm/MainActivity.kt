@@ -21,6 +21,11 @@ class MainActivity : AppCompatActivity() {
             val email = mail.text.toString()
             if (email.isNotEmpty()) {
                 Toast.makeText(this, "Bienvenido: $email", Toast.LENGTH_SHORT).show()
+                // Creamos el intent hacia SecondActivity y lo iniciamos
+                val intent = Intent(this, SecondActivity::class.java)
+                intent.putExtra("clave", email)
+                startActivity(intent)
+                finish()
             } else {
                 Toast.makeText(this, "Por favor ingrese su usuario", Toast.LENGTH_SHORT).show()
             }
