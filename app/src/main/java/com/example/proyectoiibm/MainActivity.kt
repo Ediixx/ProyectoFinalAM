@@ -16,19 +16,26 @@ class MainActivity : AppCompatActivity() {
         val mail = findViewById<EditText>(R.id.txt_mail)
         val login = findViewById<Button>(R.id.btn_login)
         val registro = findViewById<Button>(R.id.btn_registro)
+        val btnBack = findViewById<android.widget.ImageButton>(R.id.btn_back_main)
+
+        btnBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
 
         login.setOnClickListener {
-            val email = mail.text.toString()
-            if (email.isNotEmpty()) {
-                Toast.makeText(this, "Bienvenido: $email", Toast.LENGTH_SHORT).show()
-                // Creamos el intent hacia SecondActivity y lo iniciamos
-                val intent = Intent(this, SecondActivity::class.java)
-                intent.putExtra("clave", email)
-                startActivity(intent)
-                finish()
-            } else {
+            val email = mail.text.toString().trim()
+            if (email.isEmpty()) {
+                mail.error = "Por favor ingrese su usuario"
                 Toast.makeText(this, "Por favor ingrese su usuario", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+
+            Toast.makeText(this, "Bienvenido: $email", Toast.LENGTH_SHORT).show()
+            // Creamos el intent hacia SecondActivity y lo iniciamos
+            val intent = Intent(this, SecondActivity::class.java)
+            intent.putExtra("clave", email)
+            startActivity(intent)
+            finish()
         }
 
         // Al presionar el botón de registro, navegamos a FirstActivity (activity_first.xml)

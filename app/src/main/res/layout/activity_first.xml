@@ -8,7 +8,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF">
 
         <ImageButton
             android:id="@+id/btn_back"
@@ -46,6 +47,7 @@
                 android:gravity="center"
                 android:hint="Nombres"
                 android:inputType="textPersonName"
+                android:maxLength="50"
                 android:textColor="#000000"
                 android:textColorHint="#757575" />
 
@@ -57,6 +59,7 @@
                 android:gravity="center"
                 android:hint="Apellidos"
                 android:inputType="textPersonName"
+                android:maxLength="50"
                 android:textColor="#000000"
                 android:textColorHint="#757575" />
 
@@ -81,6 +84,7 @@
                 android:gravity="center"
                 android:hint="Correo Electrónico"
                 android:inputType="textEmailAddress"
+                android:maxLength="50"
                 android:textColor="#000000"
                 android:textColorHint="#757575" />
 
@@ -92,6 +96,7 @@
                 android:gravity="center"
                 android:hint="Contraseña"
                 android:inputType="textPassword"
+                android:maxLength="16"
                 android:textColor="#000000"
                 android:textColorHint="#757575" />
 
@@ -103,6 +108,7 @@
                 android:gravity="center"
                 android:hint="Confirmar Contraseña"
                 android:inputType="textPassword"
+                android:maxLength="16"
                 android:textColor="#000000"
                 android:textColorHint="#757575" />
 

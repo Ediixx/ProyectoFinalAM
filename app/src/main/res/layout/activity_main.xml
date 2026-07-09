@@ -2,26 +2,40 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="#FAF9F5">
 
-    <LinearLayout
-        android:id="@+id/lty_main"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="32dp">
+        android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/img_logo"
-            android:layout_width="280dp"
-            android:layout_height="180dp"
-            android:layout_marginBottom="24dp"
-            android:scaleType="centerInside"
-            android:adjustViewBounds="true"
-            android:background="#FFFFFF"
-            android:src="@drawable/sanaya2" />
+        <ImageButton
+            android:id="@+id/btn_back_main"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Regresar"
+            android:src="@drawable/ic_back_arrow"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/lty_main"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp">
+
+            <ImageView
+                android:id="@+id/img_logo"
+                android:layout_width="280dp"
+                android:layout_height="180dp"
+                android:layout_marginBottom="24dp"
+                android:scaleType="centerInside"
+                android:adjustViewBounds="true"
+                android:src="@drawable/sanaya2" />
 
         <TextView
             android:id="@+id/lbl_title"
@@ -30,7 +44,7 @@
             android:layout_marginBottom="24dp"
             android:gravity="center"
             android:text="Ingrese sus credenciales:"
-            android:textColor="#000000"
+            android:textColor="#1A2F4B"
             android:textSize="22sp"
             android:textStyle="bold" />
 
@@ -42,8 +56,9 @@
             android:ems="10"
             android:hint="Usuario"
             android:inputType="textEmailAddress"
-            android:textColor="#000000"
+            android:textColor="#3E3E40"
             android:textColorHint="#757575"
+            android:maxLength="50"
             android:gravity="center" />
 
         <EditText
@@ -54,8 +69,9 @@
             android:ems="10"
             android:hint="Contraseña"
             android:inputType="textPassword"
-            android:textColor="#000000"
+            android:textColor="#3E3E40"
             android:textColorHint="#757575"
+            android:maxLength="16"
             android:gravity="center" />
 
         <Button
@@ -79,15 +95,16 @@
             android:textColor="#555555"
             android:textSize="14sp" />
 
-        <Button
-            android:id="@+id/btn_registro"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#3DB470"
-            android:text="Regístrate aquí"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            <Button
+                android:id="@+id/btn_registro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#3DB470"
+                android:text="Regístrate aquí"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-    </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
 </ScrollView>

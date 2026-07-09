@@ -27,7 +27,7 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.ProyectoIIBM">
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"> <!-- ← Tema simple -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

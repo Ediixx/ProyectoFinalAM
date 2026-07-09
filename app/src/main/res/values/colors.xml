@@ -15,4 +15,6 @@
 <!--    <color name="colorPrimarioClaro"></color>-->
 <!--    <color name="colorPrimarioObscuro"></color>-->
 
+    <color name="primary">#3DB470</color>
+    <color name="app_background">#FAF9F5</color>
 </resources>

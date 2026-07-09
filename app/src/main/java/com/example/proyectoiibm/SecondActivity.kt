@@ -23,6 +23,9 @@ class SecondActivity : AppCompatActivity() {
         val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.my_toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_back_arrow)
+        
         // Recibimos el valor
         val recibo = intent.getStringExtra("clave")
 
@@ -54,6 +57,10 @@ class SecondActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
             R.id.li_perfil -> {
                 Toast.makeText(this, "Ir a Perfil", Toast.LENGTH_SHORT).show()
                 true
