@@ -28,22 +28,31 @@ class SecondActivity : AppCompatActivity() {
         
         // Recibimos el valor
         val recibo = intent.getStringExtra("clave")
+        val userId = intent.getLongExtra("userId", -1L)
 
         // Buscamos el ID correcto
         val nombreView = findViewById<TextView>(R.id.txt_nombre)
         // Tarjeta "Agendar cita" del home
         val lyAgendarCita = findViewById<LinearLayout>(R.id.ly_agendar_cita)
         lyAgendarCita.setOnClickListener {
-            startActivity(Intent(this, AgendarCitaActivity::class.java))
+            val intent = Intent(this, AgendarCitaActivity::class.java)
+            intent.putExtra("userId", userId)
+            startActivity(intent)
         }
         findViewById<LinearLayout>(R.id.ly_mis_citas).setOnClickListener {
-            Toast.makeText(this, "Ir a mis citas", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, MisCitasActivity::class.java)
+            intent.putExtra("userId", userId)
+            startActivity(intent)
         }
         findViewById<LinearLayout>(R.id.ly_historial).setOnClickListener {
-            Toast.makeText(this, "Ir a historial", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, HistorialActivity::class.java)
+            intent.putExtra("userId", userId)
+            startActivity(intent)
         }
         findViewById<LinearLayout>(R.id.ly_perfil).setOnClickListener {
-            Toast.makeText(this, "Ir a mi perfil", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, PerfilActivity::class.java)
+            intent.putExtra("userId", userId)
+            startActivity(intent)
         }
 
         // Mostramos el nombre (o un texto por defecto si viene vacío)
@@ -56,17 +65,34 @@ class SecondActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val userId = intent.getLongExtra("userId", -1L)
         return when (item.itemId) {
             android.R.id.home -> {
                 finish()
                 true
             }
             R.id.li_perfil -> {
-                Toast.makeText(this, "Ir a Perfil", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, PerfilActivity::class.java)
+                intent.putExtra("userId", userId)
+                startActivity(intent)
                 true
             }
             R.id.li_cita -> {
-                startActivity(Intent(this, AgendarCitaActivity::class.java))
+                val intent = Intent(this, AgendarCitaActivity::class.java)
+                intent.putExtra("userId", userId)
+                startActivity(intent)
+                true
+            }
+            R.id.li_mis_citas -> {
+                val intent = Intent(this, MisCitasActivity::class.java)
+                intent.putExtra("userId", userId)
+                startActivity(intent)
+                true
+            }
+            R.id.li_historial -> {
+                val intent = Intent(this, HistorialActivity::class.java)
+                intent.putExtra("userId", userId)
+                startActivity(intent)
                 true
             }
             R.id.li_salir -> {

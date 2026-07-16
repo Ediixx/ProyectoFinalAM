@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.ProyectoIIBM" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Theme.ProyectoIIBM" parent="Theme.Material3.Light.NoActionBar">
         <item name="android:windowBackground">#FFFFFF</item>
         <item name="android:colorBackground">#FFFFFF</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="colorPrimary">#3DB470</item>
     </style>
 
-    <style name="Theme.MisActivities" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Theme.MisActivities" parent="Theme.Material3.Light.NoActionBar">
         <item name="android:windowBackground">#FFFFFF</item>
         <item name="android:colorBackground">#FFFFFF</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="colorPrimary">#3DB470</item>
     </style>
 
 </resources>

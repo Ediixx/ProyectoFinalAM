@@ -4,7 +4,7 @@
     <item
         android:id="@+id/li_perfil"
         android:icon="@drawable/baseline_account_box_24"
-        android:title="Perfil"
+        android:title="Mi Perfil"
         app:showAsAction="never" />
     <item
         android:id="@+id/li_cita"
@@ -12,7 +12,17 @@
         android:icon="@drawable/outline_calendar_month_24"
         app:showAsAction="never" />
     <item
+        android:id="@+id/li_mis_citas"
+        android:title="Mis Citas"
+        android:icon="@drawable/outline_fact_check_24"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/li_historial"
+        android:title="Historial"
+        android:icon="@drawable/outline_history_24"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/li_salir"
-        android:title="Salir"
+        android:title="Cerrar Sesión"
         app:showAsAction="never" />
 </menu>

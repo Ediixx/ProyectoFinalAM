@@ -7,6 +7,13 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import com.example.proyectoiibm.data.local.SanaYaDatabase
+import com.example.proyectoiibm.data.local.entity.UserEntity
+import com.example.proyectoiibm.data.repository.SanaYaRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 
 class FirstActivity : AppCompatActivity() {
@@ -92,9 +99,31 @@ class FirstActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            Toast.makeText(this, "Usuario creado exitosamente", Toast.LENGTH_LONG).show()
-            // Regresar al login (MainActivity) automáticamente
-            finish()
+            // Registro en Base de Datos (SanaYa)
+            val nuovoUsuario = UserEntity(
+                names = nombres,
+                lastName = apellidos,
+                birthDate = fecha,
+                email = email,
+                password = pass
+            )
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                val db = SanaYaDatabase.getDatabase(this@FirstActivity)
+                val repository = SanaYaRepository(db.userDao(), db.specialtyDao(), db.doctorDao(), db.appointmentDao())
+                
+                val result = repository.registrarUsuario(nuovoUsuario)
+                
+                withContext(Dispatchers.Main) {
+                    result.onSuccess {
+                        Toast.makeText(this@FirstActivity, "Usuario creado exitosamente", Toast.LENGTH_LONG).show()
+                        finish()
+                    }.onFailure {
+                        txtEmail.error = it.message
+                        Toast.makeText(this@FirstActivity, it.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
     }
 }

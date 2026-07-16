@@ -8,45 +8,37 @@ import android.view.Gravity
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.example.proyectoiibm.data.local.SanaYaDatabase
+import com.example.proyectoiibm.data.local.entity.AppointmentEntity
+import com.example.proyectoiibm.data.local.entity.DoctorEntity
+import com.example.proyectoiibm.data.local.entity.SpecialtyEntity
+import com.example.proyectoiibm.data.repository.SanaYaRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
-
-data class Doctor(val nombre: String, val disponible: Boolean)
 
 class AgendarCitaActivity : AppCompatActivity() {
 
     private var pasoActual = 0
     private val totalPasos = 4
 
-    private var especialidadSeleccionada: String? = null
-    private var doctorSeleccionado: String? = null
+    private var especialidadSeleccionada: SpecialtyEntity? = null
+    private var doctorSeleccionado: DoctorEntity? = null
     private var fechaSeleccionada: String? = null
     private var horaSeleccionada: String? = null
 
-    private val especialidades = listOf("Cardiología", "Neurología", "Odontología", "Oftalmología")
-
-    private val doctoresPorEspecialidad = mapOf(
-        "Cardiología" to listOf(
-            Doctor("Dr. Carlos López", true),
-            Doctor("Dra. Patricia Ruiz", true),
-            Doctor("Dr. Manuel Torres", false)
-        ),
-        "Neurología" to listOf(
-            Doctor("Dra. Ana Vega", true),
-            Doctor("Dr. Jorge Salas", false)
-        ),
-        "Odontología" to listOf(
-            Doctor("Dr. Luis Peña", true),
-            Doctor("Dra. Sofía Cruz", true)
-        ),
-        "Oftalmología" to listOf(
-            Doctor("Dra. Elena Ríos", true),
-            Doctor("Dr. Mario Ibarra", false)
-        )
-    )
+    private var listaEspecialidadesDB: List<SpecialtyEntity> = emptyList()
+    private var listaDoctoresDB: List<DoctorEntity> = emptyList()
 
     private val horarios = listOf(
         "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00"
     )
+
+    // Repository
+    private lateinit var repository: SanaYaRepository
+    private var userId: Long = -1L
 
     // Views
     private lateinit var viewFlipper: ViewFlipper
@@ -67,6 +59,11 @@ class AgendarCitaActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_agendar_cita)
 
+        userId = intent.getLongExtra("userId", -1L)
+
+        val db = SanaYaDatabase.getDatabase(this)
+        repository = SanaYaRepository(db.userDao(), db.specialtyDao(), db.doctorDao(), db.appointmentDao())
+
         viewFlipper = findViewById(R.id.view_flipper)
         progressFill = findViewById(R.id.progress_fill)
         txtEstadoProgreso = findViewById(R.id.txt_estado_progreso)
@@ -83,7 +80,7 @@ class AgendarCitaActivity : AppCompatActivity() {
 
         findViewById<ImageButton>(R.id.btn_back_agendar).setOnClickListener { finish() }
 
-        construirEspecialidades()
+        cargarEspecialidades()
 
         txtFechaCita.setOnClickListener { mostrarDatePicker() }
         btnCalendario.setOnClickListener { mostrarDatePicker() }
@@ -97,7 +94,7 @@ class AgendarCitaActivity : AppCompatActivity() {
 
         btnSiguiente.setOnClickListener {
             if (pasoActual == totalPasos - 1) {
-                mostrarDialogoExito()
+                confirmarYGuardarCita()
             } else {
                 pasoActual++
                 actualizarUI()
@@ -107,14 +104,38 @@ class AgendarCitaActivity : AppCompatActivity() {
         actualizarUI()
     }
 
+    private fun cargarEspecialidades() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            listaEspecialidadesDB = repository.obtenerEspecialidades()
+            
+            // Si está vacío, esperamos un momento por si el seeding está en proceso (solo en primer arranque)
+            if (listaEspecialidadesDB.isEmpty()) {
+                kotlinx.coroutines.delay(500)
+                listaEspecialidadesDB = repository.obtenerEspecialidades()
+            }
+
+            withContext(Dispatchers.Main) {
+                construirEspecialidades()
+            }
+        }
+    }
+
     private fun construirEspecialidades() {
         gridEspecialidades.removeAllViews()
-        val iconos = mapOf(
+        
+        val isLandscape = resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+        gridEspecialidades.columnCount = if (isLandscape) 4 else 2
+
+        val iconosMapping = mapOf(
             "Cardiología" to "❤️", "Neurología" to "🧠",
-            "Odontología" to "🦷", "Oftalmología" to "👁️"
+            "Odontología" to "🦷", "Oftalmología" to "👁️",
+            "Médico General" to "👨‍⚕️", "Traumatología" to "🦴",
+            "Vacunación" to "💉", "Pediatría" to "👶"
         )
-        especialidades.forEach { esp ->
-            val card = crearTarjeta(iconos[esp] ?: "", esp)
+        
+        listaEspecialidadesDB.forEach { esp ->
+            val emoji = iconosMapping[esp.nombre] ?: "🏥"
+            val card = crearTarjeta(emoji, esp.nombre)
             card.setOnClickListener {
                 especialidadSeleccionada = esp
                 doctorSeleccionado = null
@@ -146,7 +167,7 @@ class AgendarCitaActivity : AppCompatActivity() {
 
         val txtNombre = TextView(this)
         txtNombre.text = texto
-        txtNombre.textSize = 16f
+        txtNombre.textSize = 14f
         txtNombre.gravity = Gravity.CENTER
         txtNombre.setPadding(0, 16, 0, 0)
         layout.addView(txtNombre)
@@ -164,12 +185,22 @@ class AgendarCitaActivity : AppCompatActivity() {
         )
     }
 
+    private fun cargarDoctores() {
+        val espId = especialidadSeleccionada?.id ?: return
+        lifecycleScope.launch(Dispatchers.IO) {
+            listaDoctoresDB = repository.obtenerDoctoresPorEspecialidad(espId)
+            withContext(Dispatchers.Main) {
+                construirDoctores()
+            }
+        }
+    }
+
     private fun construirDoctores() {
         listaDoctores.removeAllViews()
         val esp = especialidadSeleccionada ?: return
-        txtEspecialidadSeleccionada.text = "Especialidad: $esp"
+        txtEspecialidadSeleccionada.text = "Especialidad: ${esp.nombre}"
 
-        doctoresPorEspecialidad[esp]?.forEach { doc ->
+        listaDoctoresDB.forEach { doc ->
             val card = LinearLayout(this)
             card.orientation = LinearLayout.VERTICAL
             card.setPadding(24, 24, 24, 24)
@@ -182,22 +213,27 @@ class AgendarCitaActivity : AppCompatActivity() {
             val txtNombre = TextView(this)
             txtNombre.text = doc.nombre
             txtNombre.textSize = 16f
-            txtNombre.setTextColor(if (doc.disponible) Color.BLACK else Color.GRAY)
+            txtNombre.setTextColor(Color.BLACK)
             card.addView(txtNombre)
 
-            val txtEstado = TextView(this)
-            txtEstado.text = if (doc.disponible) "✓ Disponible" else "✗ No disponible"
-            txtEstado.setTextColor(if (doc.disponible) Color.parseColor("#2ECC71") else Color.GRAY)
-            card.addView(txtEstado)
+            val txtDir = TextView(this)
+            txtDir.text = doc.direccion
+            txtDir.textSize = 12f
+            txtDir.setTextColor(Color.GRAY)
+            card.addView(txtDir)
 
-            actualizarEstiloTarjeta(card, doc.nombre == doctorSeleccionado, doc.disponible)
+            val txtDist = TextView(this)
+            txtDist.text = "${doc.distanciaKm} km de distancia"
+            txtDist.textSize = 12f
+            txtDist.setTextColor(Color.parseColor("#2ECC71"))
+            card.addView(txtDist)
 
-            if (doc.disponible) {
-                card.setOnClickListener {
-                    doctorSeleccionado = doc.nombre
-                    construirDoctores()
-                    btnSiguiente.isEnabled = true
-                }
+            actualizarEstiloTarjeta(card, doc == doctorSeleccionado, true)
+
+            card.setOnClickListener {
+                doctorSeleccionado = doc
+                construirDoctores()
+                btnSiguiente.isEnabled = true
             }
             listaDoctores.addView(card)
         }
@@ -205,8 +241,8 @@ class AgendarCitaActivity : AppCompatActivity() {
 
     private fun construirResumen(contenedor: LinearLayout) {
         contenedor.removeAllViews()
-        val items = mutableListOf("📋 $especialidadSeleccionada")
-        doctorSeleccionado?.let { items.add("🧑‍⚕️ $it") }
+        val items = mutableListOf("📋 ${especialidadSeleccionada?.nombre ?: ""}")
+        doctorSeleccionado?.let { items.add("🧑‍⚕️ ${it.nombre}") }
         fechaSeleccionada?.let { items.add("📅 $it") }
 
         items.forEach {
@@ -229,6 +265,9 @@ class AgendarCitaActivity : AppCompatActivity() {
 
     private fun construirHorarios() {
         gridHorarios.removeAllViews()
+        val isLandscape = resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+        gridHorarios.columnCount = if (isLandscape) 5 else 3
+
         horarios.forEach { hora ->
             val btn = Button(this)
             btn.text = hora
@@ -256,8 +295,8 @@ class AgendarCitaActivity : AppCompatActivity() {
 
         // Progreso
         val params = progressFill.layoutParams
-        val anchoTotal = 100
-        params.width = (anchoTotal * (pasoActual + 1) / totalPasos) * 4 // aproximado en dp*density
+        val anchoTotal = resources.displayMetrics.widthPixels - 32 * resources.displayMetrics.density // aprox
+        params.width = ((anchoTotal * (pasoActual + 1) / totalPasos)).toInt()
         progressFill.layoutParams = params
 
         txtEstadoProgreso.text = if (pasoActual == totalPasos - 1) "✓ Listo para confirmar" else "Completa todos los datos"
@@ -268,7 +307,7 @@ class AgendarCitaActivity : AppCompatActivity() {
         when (pasoActual) {
             0 -> btnSiguiente.isEnabled = especialidadSeleccionada != null
             1 -> {
-                construirDoctores()
+                cargarDoctores()
                 btnSiguiente.isEnabled = doctorSeleccionado != null
             }
             2 -> {
@@ -284,10 +323,35 @@ class AgendarCitaActivity : AppCompatActivity() {
         }
     }
 
+    private fun confirmarYGuardarCita() {
+        val user = userId
+        val doc = doctorSeleccionado ?: return
+        val esp = especialidadSeleccionada ?: return
+        val fecha = fechaSeleccionada ?: ""
+        val hora = horaSeleccionada ?: ""
+
+        val cita = AppointmentEntity(
+            usuarioId = user,
+            doctorId = doc.id,
+            especialidadNombre = esp.nombre,
+            direccion = doc.direccion,
+            fechaTexto = fecha,
+            horaTexto = hora,
+            fechaHoraMillis = System.currentTimeMillis() // Simplificación
+        )
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            repository.agendarCita(cita)
+            withContext(Dispatchers.Main) {
+                mostrarDialogoExito()
+            }
+        }
+    }
+
     private fun mostrarDialogoExito() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_cita_exito, null)
         val txtResumen = dialogView.findViewById<TextView>(R.id.txt_resumen_dialog)
-        txtResumen.text = "$especialidadSeleccionada con $doctorSeleccionado el\n$fechaSeleccionada a las $horaSeleccionada"
+        txtResumen.text = "${especialidadSeleccionada?.nombre} con ${doctorSeleccionado?.nombre} el\n$fechaSeleccionada a las $horaSeleccionada"
 
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)

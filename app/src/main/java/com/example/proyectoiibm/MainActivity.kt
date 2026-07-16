@@ -6,6 +6,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.example.proyectoiibm.data.local.SanaYaDatabase
+import com.example.proyectoiibm.data.repository.SanaYaRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,18 +30,37 @@ class MainActivity : AppCompatActivity() {
 
         login.setOnClickListener {
             val email = mail.text.toString().trim()
+            val passwordField = findViewById<EditText>(R.id.txt_pass)
+            val password = passwordField.text.toString().trim()
+
             if (email.isEmpty()) {
                 mail.error = "Por favor ingrese su usuario"
-                Toast.makeText(this, "Por favor ingrese su usuario", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (password.isEmpty()) {
+                passwordField.error = "Por favor ingrese su contraseña"
                 return@setOnClickListener
             }
 
-            Toast.makeText(this, "Bienvenido: $email", Toast.LENGTH_SHORT).show()
-            // Creamos el intent hacia SecondActivity y lo iniciamos
-            val intent = Intent(this, SecondActivity::class.java)
-            intent.putExtra("clave", email)
-            startActivity(intent)
-            finish()
+            lifecycleScope.launch(Dispatchers.IO) {
+                val db = SanaYaDatabase.getDatabase(this@MainActivity)
+                val repository = SanaYaRepository(db.userDao(), db.specialtyDao(), db.doctorDao(), db.appointmentDao())
+                
+                val usuario = repository.iniciarSesion(email, password)
+
+                withContext(Dispatchers.Main) {
+                    if (usuario != null) {
+                        Toast.makeText(this@MainActivity, "Bienvenido: ${usuario.names}", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this@MainActivity, SecondActivity::class.java)
+                        intent.putExtra("clave", usuario.names)
+                        intent.putExtra("userId", usuario.id)
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        Toast.makeText(this@MainActivity, "Credenciales incorrectas o usuario no existe", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
 
         // Al presionar el botón de registro, navegamos a FirstActivity (activity_first.xml)
