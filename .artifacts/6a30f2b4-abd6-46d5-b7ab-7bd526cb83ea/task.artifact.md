@@ -1,3 +1,0 @@
-- [x] Implementar restricción de unicidad en Doctores (`DoctorEntity.kt`)
-- [x] Actualizar versión de la base de datos (`SanaYaDatabase.kt`)
-- [x] Verificación final (Build y limpieza de datos)
