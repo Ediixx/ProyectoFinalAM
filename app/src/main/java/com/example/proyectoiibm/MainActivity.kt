@@ -24,11 +24,11 @@ class MainActivity : AppCompatActivity() {
         val registro = findViewById<Button>(R.id.btn_registro)
         val btnBack = findViewById<android.widget.ImageButton>(R.id.btn_back_main)
 
-        btnBack.setOnClickListener {
+        btnBack?.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
 
-        login.setOnClickListener {
+        login?.setOnClickListener {
             val email = mail.text.toString().trim()
             val passwordField = findViewById<EditText>(R.id.txt_pass)
             val password = passwordField.text.toString().trim()

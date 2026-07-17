@@ -80,6 +80,14 @@ class AgendarCitaActivity : AppCompatActivity() {
 
         findViewById<ImageButton>(R.id.btn_back_agendar).setOnClickListener { finish() }
 
+        // Restaurar estado si existe
+        if (savedInstanceState != null) {
+            pasoActual = savedInstanceState.getInt("pasoActual", 0)
+            fechaSeleccionada = savedInstanceState.getString("fecha")
+            horaSeleccionada = savedInstanceState.getString("hora")
+            userId = savedInstanceState.getLong("userId", -1L)
+        }
+
         cargarEspecialidades()
 
         txtFechaCita.setOnClickListener { mostrarDatePicker() }
@@ -102,6 +110,14 @@ class AgendarCitaActivity : AppCompatActivity() {
         }
 
         actualizarUI()
+    }
+
+    override fun onSaveInstanceState(outState: android.os.Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("pasoActual", pasoActual)
+        outState.putString("fecha", fechaSeleccionada)
+        outState.putString("hora", horaSeleccionada)
+        outState.putLong("userId", userId)
     }
 
     private fun cargarEspecialidades() {

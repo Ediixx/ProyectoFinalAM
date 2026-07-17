@@ -25,7 +25,7 @@ class FirstActivity : AppCompatActivity() {
         val btnBack = findViewById<ImageButton>(R.id.btn_back)
 
         // Botón para regresar
-        btnBack.setOnClickListener {
+        btnBack?.setOnClickListener {
             finish()
         }
         
